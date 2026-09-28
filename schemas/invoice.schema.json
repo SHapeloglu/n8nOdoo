@@ -1,0 +1,69 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/SHapeloglu/n8nOdoo/schemas/invoice.schema.json",
+  "title": "n8nOdoo Normalized Supplier Invoice",
+  "type": "object",
+  "required": ["document_type", "schema_version", "invoice", "supplier", "lines", "source"],
+  "properties": {
+    "document_type": {"const": "vendor_invoice"},
+    "schema_version": {"const": "1.0"},
+    "supplier": {
+      "type": "object",
+      "properties": {
+        "name": {"type": ["string", "null"]},
+        "tax_id": {"type": ["string", "null"]},
+        "email": {"type": ["string", "null"]},
+        "phone": {"type": ["string", "null"]},
+        "bank_accounts": {"type": "array", "items": {"type": "string"}}
+      },
+      "additionalProperties": false
+    },
+    "invoice": {
+      "type": "object",
+      "required": ["number", "date", "currency", "total"],
+      "properties": {
+        "number": {"type": ["string", "null"]},
+        "date": {"type": ["string", "null"], "format": "date"},
+        "due_date": {"type": ["string", "null"], "format": "date"},
+        "currency": {"type": ["string", "null"]},
+        "subtotal": {"type": ["number", "null"]},
+        "tax": {"type": ["number", "null"]},
+        "total": {"type": ["number", "null"]},
+        "payment_reference": {"type": ["string", "null"]}
+      },
+      "additionalProperties": false
+    },
+    "lines": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["description", "quantity", "unit_price", "line_total"],
+        "properties": {
+          "description": {"type": ["string", "null"]},
+          "supplier_product_code": {"type": ["string", "null"]},
+          "product_code": {"type": ["string", "null"]},
+          "quantity": {"type": ["number", "null"]},
+          "uom": {"type": ["string", "null"]},
+          "unit_price": {"type": ["number", "null"]},
+          "tax_rate": {"type": ["number", "null"]},
+          "line_total": {"type": ["number", "null"]}
+        },
+        "additionalProperties": false
+      }
+    },
+    "source": {
+      "type": "object",
+      "required": ["channel"],
+      "properties": {
+        "channel": {"type": "string", "enum": ["email", "whatsapp", "web", "api", "manual", "other"]},
+        "message_id": {"type": ["string", "null"]},
+        "file_hash": {"type": ["string", "null"]},
+        "ocr_provider": {"type": ["string", "null"]},
+        "llm_provider": {"type": ["string", "null"]},
+        "extraction_confidence": {"type": ["number", "null"], "minimum": 0, "maximum": 1}
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}
