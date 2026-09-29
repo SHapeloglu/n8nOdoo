@@ -1,0 +1,109 @@
+{
+  "name": "M1 - Odoo Partner Lookup (Read Only)",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "odoo-partner-lookup",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "id": "webhook",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const body = $json.body ?? $json;\nconst input = { vat: body.vat ?? null, name: body.name ?? null, email: body.email ?? null, phone: body.phone ?? null, ref: body.ref ?? null, company_id: body.company_id ?? null };\nif (!input.vat && !input.name && !input.email && !input.phone && !input.ref) throw new Error('At least one partner lookup field is required.');\nreturn [{ json: input }];"
+      },
+      "id": "normalize-input",
+      "name": "Normalize Input",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        220,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.ODOO_BASE_URL + '/jsonrpc' }}",
+        "sendBody": true,
+        "contentType": "json",
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({jsonrpc:'2.0',method:'call',params:{service:'object',method:'execute_kw',args:[$env.ODOO_DB,$env.ODOO_UID,$env.ODOO_API_KEY,'res.partner','search_read',[[['vat','=',$json.vat]]],{fields:['id','name','vat','company_type','is_company','customer_rank','supplier_rank','email','phone','mobile','ref','parent_id','commercial_partner_id','active','company_id'],limit:10}]},id:Date.now()}) }}",
+        "options": {}
+      },
+      "id": "odoo-vat",
+      "name": "Odoo VAT Lookup",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        460,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const response = $json.result ?? $json;\nconst rows = Array.isArray(response) ? response : [];\nreturn [{json:{status: rows.length === 1 ? 'matched' : rows.length > 1 ? 'multiple_candidates' : 'not_found',candidates:rows.map(p=>({partner_id:p.id,name:p.name,vat:p.vat,is_customer:(p.customer_rank??0)>0,is_supplier:(p.supplier_rank??0)>0,commercial_partner_id:Array.isArray(p.commercial_partner_id)?p.commercial_partner_id[0]:p.commercial_partner_id,company_id:Array.isArray(p.company_id)?p.company_id[0]:p.company_id,match:{method:'vat_exact',confidence:1.0}}))}}}];"
+      },
+      "id": "normalize-response",
+      "name": "Normalize Odoo Response",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        700,
+        0
+      ]
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Normalize Input",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize Input": {
+      "main": [
+        [
+          {
+            "node": "Odoo VAT Lookup",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Odoo VAT Lookup": {
+      "main": [
+        [
+          {
+            "node": "Normalize Odoo Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "m1-odoo-partner-lookup",
+  "meta": {
+    "templateCredsSetupCompleted": false
+  }
+}
