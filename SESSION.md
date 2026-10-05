@@ -1,52 +1,25 @@
-# SESSION.md — n8nOdoo Oturum Günlüğü
+# SESSION.md — n8nOdoo
 
-Her çalışma oturumunda buraya kısa bir kayıt düşülür: ne yapıldı, hangi kararlar alındı, sıradaki adım ne. Amaç, bir sonraki oturuma (veya başka bir geliştiriciye/Claude örneğine) hızlıca bağlam aktarmak.
-
----
-
-## Şablon
-
-```markdown
-## YYYY-AA-GG
-
-**Yapılanlar:**
-- ...
-
-**Alınan kararlar / neden:**
-- ...
-
-**Açık sorunlar / bilinen eksikler:**
-- ...
-
-**Sıradaki adım:**
-- ...
-```
+Newest entry on top: what was done, decisions, open issues, next step.
 
 ---
 
 ## 2026-10-05
 
-**Yapılanlar:**
-- Eksik proje çalışma dosyaları oluşturuldu: `BACKLOG.md`, `CLAUDE.md`, `SESSION.md`.
-- İçerik; README, dosya yapısı, bağımlılık dosyaları ve git geçmişinden çıkarıldı.
+- Replaced the template-generated `CLAUDE.md`, `BACKLOG.md` and `SESSION.md` with content derived from the repo (README, ARCHITECTURE, PROJECT_PLAN, ROADMAP, docs/, schema, workflow).
+- Open: no `.gitignore` (add before any code/venv/.env appears); no tests yet; the M1 partner-lookup workflow has not been run against a real Odoo 18 instance.
+- Next: run `001_odoo_partner_lookup.json` against the Odoo test DB with a read-only API user and record results for the acceptance cases in `docs/M1-ODOO-PARTNER-MATCHING-API.md` (known VAT, customer-only, supplier-only, both, ambiguous, missing VAT, inactive, multi-company, auth failure, timeout).
 
-**Açık sorunlar / bilinen eksikler:**
-- Repo kökünde `.gitignore` yok — `venv/`, `__pycache__/`, `.env`, build çıktıları için eklenmeli.
-- Otomatik test bulunamadı — kritik akışlar için en azından duman (smoke) testleri eklenmeli.
+---
 
-**Sıradaki adım:**
-- `CLAUDE.md` ve `ARCHITECTURE.md` içeriğini gözden geçirip proje sahibinin bilgisiyle tamamla.
+## 2026-09-29
 
-### Bu tarihten önceki son commit'ler (referans)
+- Partner matching and document routing rules (`docs/M0-PARTNER-MATCHING.md`).
+- Odoo partner matching API design (`docs/M1-ODOO-PARTNER-MATCHING-API.md`).
+- First n8n workflow: read-only Odoo partner lookup by VAT.
 
-- 2026-09-29 — feat: add read-only Odoo partner lookup workflow
-- 2026-09-29 — docs: define Odoo partner matching API design
-- 2026-09-29 — docs: define partner matching and document routing
-- 2026-09-28 — feat: add normalized invoice schema
-- 2026-09-28 — docs: analyze invoice LLM reference implementation
-- 2026-09-28 — docs: add M0 reuse and dependency assessment
-- 2026-09-28 — docs: initialize n8nOdoo project documentation
-- 2026-09-28 — docs: initialize n8nOdoo project documentation
-- 2026-09-28 — docs: initialize n8nOdoo project documentation
-- 2026-09-28 — docs: initialize n8nOdoo project documentation
-- 2026-09-28 — docs: initialize n8nOdoo project documentation
+## 2026-09-28
+
+- Project documentation initialized (README, ARCHITECTURE, PROJECT_PLAN, ROADMAP, TASKS).
+- M0 reuse/dependency assessment and invoice-LLM reference analysis.
+- Normalized supplier invoice JSON schema.
