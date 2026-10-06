@@ -1,48 +1,48 @@
-# M0 — Reuse / Fork / Rewrite Assessment
+# M0 — Yeniden Kullan / Fork Et / Yeniden Yaz Değerlendirmesi
 
-## Purpose
+## Amaç
 
-This document records the initial assessment of existing open-source components before implementation. The project target is Odoo 18 + n8n.
+Bu belge, uygulamaya geçmeden önce mevcut açık kaynak bileşenlerin ilk değerlendirmesini kaydeder. Proje hedefi Odoo 18 + n8n'dir.
 
-## Initial matrix
+## İlk matris
 
-| Component | Odoo 18 | Initial decision | Why |
+| Bileşen | Odoo 18 | İlk karar | Neden |
 |---|---|---|---|
-| OCA DMS | Yes | **REUSE** | Mature document-management foundation; includes auto-classification modules. |
-| OCA `dms_auto_classification` | Yes | **REUSE / EXTEND** | Useful for deterministic/document routing, but AI classification remains our orchestration concern. |
-| OCA `dms_field_auto_classification` | Yes | **REUSE / EVALUATE** | Useful when documents need to be embedded in Odoo records. |
-| Apexive `odoo-llm` core | Yes | **REUSE / CONTROLLED DEPENDENCY** | Provides provider abstraction, model management and security/tool framework. |
-| Apexive `llm_tool_ocr_mistral` | Yes | **REUSE / OPTIONAL PROVIDER** | Existing PDF/image OCR through Mistral vision. Keep OCR provider replaceable. |
-| Apexive `account_invoice_import_llm` | Yes | **REFERENCE + POSSIBLE REUSE** | Directly overlaps with MVP invoice extraction/import; must inspect implementation and dependency boundaries before adoption. |
-| n8n | N/A | **CORE** | Main orchestration, routing, channel integration, retries and approvals. |
-| Existing n8n/Odoo nodes | Varies | **EVALUATE** | Prefer maintained Odoo 18-compatible integration; do not depend on archived/older nodes without tests. |
-| Custom Odoo module | Odoo 18 | **WRITE OURSELVES** | Own document state, audit, approval and integration contracts are project-specific. |
-| Business rules | Odoo 18 + n8n | **WRITE OURSELVES** | Financial validation must be deterministic and independently testable. |
-| Audit/idempotency | Odoo + n8n | **WRITE OURSELVES** | Core product requirement; must not depend on AI behaviour. |
+| OCA DMS | Evet | **YENİDEN KULLAN** | Olgun belge yönetimi temeli; otomatik sınıflandırma modüllerini içerir. |
+| OCA `dms_auto_classification` | Evet | **YENİDEN KULLAN / GENİŞLET** | Deterministik belge yönlendirme için yararlı; ancak AI sınıflandırma bizim orkestrasyon sorumluluğumuzda kalır. |
+| OCA `dms_field_auto_classification` | Evet | **YENİDEN KULLAN / DEĞERLENDİR** | Belgelerin Odoo kayıtlarına gömülmesi gerektiğinde yararlı. |
+| Apexive `odoo-llm` çekirdeği | Evet | **YENİDEN KULLAN / KONTROLLÜ BAĞIMLILIK** | Sağlayıcı soyutlaması, model yönetimi ve güvenlik/araç çerçevesi sağlar. |
+| Apexive `llm_tool_ocr_mistral` | Evet | **YENİDEN KULLAN / İSTEĞE BAĞLI SAĞLAYICI** | Mistral vision ile mevcut PDF/görüntü OCR'ı. OCR sağlayıcısı değiştirilebilir kalmalı. |
+| Apexive `account_invoice_import_llm` | Evet | **REFERANS + OLASI YENİDEN KULLANIM** | MVP fatura veri çıkarma/içe aktarmayla doğrudan örtüşüyor; benimsemeden önce uygulaması ve bağımlılık sınırları incelenmeli. |
+| n8n | — | **ÇEKİRDEK** | Ana orkestrasyon, yönlendirme, kanal entegrasyonu, yeniden denemeler ve onaylar. |
+| Mevcut n8n/Odoo node'ları | Değişken | **DEĞERLENDİR** | Bakımı süren, Odoo 18 uyumlu entegrasyonu tercih et; arşivlenmiş/eski node'lara test olmadan bağımlı olma. |
+| Özel Odoo modülü | Odoo 18 | **KENDİMİZ YAZACAĞIZ** | Belge durumu, denetim, onay ve entegrasyon sözleşmeleri projeye özgü. |
+| İş kuralları | Odoo 18 + n8n | **KENDİMİZ YAZACAĞIZ** | Finansal doğrulama deterministik ve bağımsız test edilebilir olmalı. |
+| Denetim/idempotency | Odoo + n8n | **KENDİMİZ YAZACAĞIZ** | Çekirdek ürün gereksinimi; AI davranışına bağlı olmamalı. |
 
-## Evidence reviewed
+## İncelenen kanıtlar
 
 ### OCA DMS
 
-The OCA DMS repository exposes an Odoo 18 branch with `dms`, `dms_auto_classification`, `dms_field`, `dms_field_auto_classification`, `dms_user_role`, `hr_dms_field` and related modules. The repository states that the repository is AGPL-3.0 but individual module licenses must be checked in each `__manifest__.py`. See the upstream repository before selecting a module for distribution.
+OCA DMS deposu `dms`, `dms_auto_classification`, `dms_field`, `dms_field_auto_classification`, `dms_user_role`, `hr_dms_field` ve ilgili modülleri içeren bir Odoo 18 dalı sunuyor. Depo AGPL-3.0 olduğunu belirtiyor, ancak tek tek modül lisansları her `__manifest__.py` içinde kontrol edilmeli. Dağıtım için modül seçmeden önce upstream depoya bak.
 
-Source: https://github.com/OCA/dms
+Kaynak: https://github.com/OCA/dms
 
 ### Apexive Odoo LLM
 
-The Odoo 18 branch contains a core `llm` framework, assistants, tool framework, multiple providers, OCR tooling, knowledge/RAG and accounting tools. The repository explicitly lists `account_invoice_import_llm` and `llm_tool_ocr_mistral` among its Odoo 18 modules.
+Odoo 18 dalı çekirdek bir `llm` çerçevesi, asistanlar, araç çerçevesi, birden fazla sağlayıcı, OCR araçları, bilgi/RAG ve muhasebe araçları içeriyor. Depo, Odoo 18 modülleri arasında `account_invoice_import_llm` ve `llm_tool_ocr_mistral`'ı açıkça listeliyor.
 
-Source: https://github.com/apexive/odoo-llm
+Kaynak: https://github.com/apexive/odoo-llm
 
-### Current maintenance caveat
+### Güncel bakım uyarısı
 
-`odoo-llm` has active development and open issues. This is not a reason to reject it, but production adoption should be pinned to a tested commit/release and covered by integration tests. In particular, the open issue list contains an invoice-import tax issue and an Odoo 18 Enterprise issue.
+`odoo-llm` aktif geliştiriliyor ve açık issue'ları var. Bu reddetmek için bir neden değil, ancak üretimde benimsenirken test edilmiş bir commit/sürüme sabitlenmeli ve entegrasyon testleriyle kapsanmalı. Özellikle açık issue listesinde bir fatura içe aktarma vergi sorunu ve bir Odoo 18 Enterprise sorunu var.
 
-Source: https://github.com/apexive/odoo-llm/issues
+Kaynak: https://github.com/apexive/odoo-llm/issues
 
-## Architecture decision
+## Mimari karar
 
-We will **not** make the AI/OCR stack the centre of the product. The centre is the n8n workflow plus deterministic Odoo validation.
+AI/OCR yığınını ürünün merkezi **yapmayacağız**. Merkez, n8n iş akışı ile deterministik Odoo doğrulamasıdır.
 
 ```text
 Channel
@@ -58,19 +58,21 @@ Channel
   -> audit
 ```
 
-## Rules for external dependencies
+(Kanal → n8n → belge alımı → OCR / LLM sağlayıcısı → normalleştirilmiş JSON → Odoo araması → deterministik doğrulama → gerektiğinde onay → Odoo işlemi → DMS arşivi → denetim)
 
-Before adding any dependency, verify:
+## Harici bağımlılık kuralları
 
-1. Odoo 18 compatibility
-2. License of the exact module
-3. Runtime dependencies
-4. Security model
-5. Maintenance/activity
-6. Test coverage
-7. Upgrade/migration path
-8. Whether the dependency can be isolated behind an adapter
+Herhangi bir bağımlılık eklemeden önce doğrula:
 
-## Important boundary
+1. Odoo 18 uyumluluğu
+2. Tam olarak o modülün lisansı
+3. Çalışma zamanı bağımlılıkları
+4. Güvenlik modeli
+5. Bakım/aktivite
+6. Test kapsamı
+7. Yükseltme/taşıma yolu
+8. Bağımlılığın bir adaptör arkasında yalıtılıp yalıtılamayacağı
 
-`account_invoice_import_llm` may solve part of the invoice problem, but we should not allow it to dictate the entire product architecture. The reusable abstraction is **document intake → extraction → validation → approval → ERP action**.
+## Önemli sınır
+
+`account_invoice_import_llm` fatura sorununun bir kısmını çözebilir, ama tüm ürün mimarisini belirlemesine izin vermemeliyiz. Yeniden kullanılabilir soyutlama şudur: **belge alımı → veri çıkarma → doğrulama → onay → ERP işlemi**.

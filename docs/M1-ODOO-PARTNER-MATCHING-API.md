@@ -1,12 +1,12 @@
-# M1 — Odoo Partner Matching API Design
+# M1 — Odoo İş Ortağı Eşleştirme API Tasarımı
 
-## Goal
+## Hedef
 
-Define the smallest Odoo integration needed for n8n to search and identify a partner before any document is posted.
+Herhangi bir belge işlenmeden önce n8n'in bir iş ortağını araması ve tanımlaması için gereken en küçük Odoo entegrasyonunu tanımlamak.
 
-## Principle
+## İlke
 
-The first integration is deliberately read-only.
+İlk entegrasyon bilinçli olarak salt okunurdur.
 
 ```text
 n8n
@@ -20,24 +20,26 @@ normalized candidates
 n8n rules
 ```
 
-No invoice, payment, PO or partner mutation is performed in this milestone.
+(n8n → Odoo 18 → iş ortağı araması → normalleştirilmiş adaylar → n8n kuralları)
 
-## Candidate search order
+Bu kilometre taşında fatura, ödeme, satın alma siparişi veya iş ortağı üzerinde hiçbir değişiklik yapılmaz.
 
-Use the strongest identifiers first:
+## Aday arama sırası
 
-1. Exact VAT/VKN/TCKN when present
-2. Exact commercial/company registration identifier when configured
-3. Exact normalized email/domain when appropriate
-4. Exact normalized phone when appropriate
-5. Exact partner reference (`ref`) when supplied
-6. Name search as a weaker candidate search
+Önce en güçlü tanımlayıcıları kullan:
 
-Name-only matches must not be treated as authoritative identity.
+1. Varsa birebir VKN/TCKN
+2. Yapılandırılmışsa birebir ticaret sicili/şirket kayıt tanımlayıcısı
+3. Uygunsa birebir normalleştirilmiş e-posta/alan adı
+4. Uygunsa birebir normalleştirilmiş telefon
+5. Verilmişse birebir iş ortağı referansı (`ref`)
+6. Daha zayıf aday araması olarak unvan araması
 
-## Odoo partner fields
+Yalnızca unvana dayalı eşleşmeler yetkili kimlik olarak kabul edilmemeli.
 
-Initial fields to retrieve:
+## Odoo iş ortağı alanları
+
+Başlangıçta çekilecek alanlar:
 
 - `id`
 - `name`
@@ -55,11 +57,11 @@ Initial fields to retrieve:
 - `active`
 - `company_id`
 
-Additional fields should be requested only when a concrete rule requires them.
+Ek alanlar yalnızca somut bir kural gerektirdiğinde istenmeli.
 
-## Normalized response
+## Normalleştirilmiş yanıt
 
-n8n should not depend on the complete Odoo partner record. The integration should normalize it:
+n8n, Odoo iş ortağı kaydının tamamına bağımlı olmamalı. Entegrasyon bunu normalleştirmeli:
 
 ```json
 {
@@ -88,7 +90,7 @@ n8n should not depend on the complete Odoo partner record. The integration shoul
 }
 ```
 
-Possible statuses:
+Olası durumlar:
 
 - `matched`
 - `multiple_candidates`
@@ -96,11 +98,11 @@ Possible statuses:
 - `invalid_query`
 - `odoo_error`
 
-## Match semantics
+## Eşleşme anlamları
 
-`confidence` is a matching score, not an AI confidence score.
+`confidence` bir eşleşme puanıdır, AI güven skoru değildir.
 
-Examples:
+Örnekler:
 
 ```text
 VAT exact                 1.00
@@ -111,45 +113,47 @@ Name exact                0.70
 Name fuzzy                < 0.70
 ```
 
-These values are initial design values only. Production thresholds must be tested against real company data.
+(VKN birebir 1.00 · iş ortağı referansı birebir 1.00 · e-posta birebir 0.90 · telefon birebir 0.85 · unvan birebir 0.70 · unvan bulanık < 0.70)
 
-## Customer vs supplier
+Bunlar yalnızca ilk tasarım değerleridir. Üretim eşikleri gerçek şirket verisine karşı test edilmeli.
 
-Do not treat `customer_rank > 0` and `supplier_rank > 0` as mutually exclusive.
+## Müşteri ve tedarikçi
 
-A partner can be both.
+`customer_rank > 0` ile `supplier_rank > 0`'ı birbirini dışlayan durumlar olarak ele alma.
 
-The route is determined later using:
+Bir iş ortağı her ikisi de olabilir.
 
-- incoming document type
-- partner role
-- open purchase orders
-- open sales orders
-- historical transactions
-- company context
-- deterministic business rules.
+Yönlendirme daha sonra şunlarla belirlenir:
 
-## Company context
+- gelen belge türü
+- iş ortağı rolü
+- açık satın alma siparişleri
+- açık satış siparişleri
+- geçmiş işlemler
+- şirket bağlamı
+- deterministik iş kuralları.
 
-Every lookup must include the receiving Odoo company context whenever the deployment is multi-company.
+## Şirket bağlamı
 
-Do not assume that a partner found in Odoo automatically belongs to the receiving company.
+Kurulum çoklu şirketliyse her arama alıcı Odoo şirket bağlamını içermeli.
 
-## Security
+Odoo'da bulunan bir iş ortağının otomatik olarak alıcı şirkete ait olduğunu varsayma.
 
-The M1 integration should use a least-privilege Odoo integration user.
+## Güvenlik
 
-Read access required initially:
+M1 entegrasyonu en az yetkili bir Odoo entegrasyon kullanıcısı kullanmalı.
+
+Başlangıçta gereken okuma erişimi:
 
 - `res.partner`
 
-No write/create/unlink access is needed for M1 partner lookup.
+M1 iş ortağı araması için write/create/unlink erişimi gerekmez.
 
-Credentials must stay in n8n's credential store and must never appear in workflow JSON, logs or prompts.
+Kimlik bilgileri n8n'in kimlik bilgisi deposunda kalmalı; iş akışı JSON'unda, loglarda veya prompt'larda asla görünmemeli.
 
-## n8n sub-workflow
+## n8n alt iş akışı
 
-Proposed reusable workflow:
+Önerilen yeniden kullanılabilir iş akışı:
 
 ```text
 SUB — Odoo Partner Lookup
@@ -177,11 +181,13 @@ Normalize candidates
 Return status + candidates
 ```
 
-## Next implementation step
+(Girdi: isteğe bağlı vat/name/email/phone/ref/company_id → sorguyu doğrula → VKN araması → sonuç yoksa referans araması → sonuç yoksa e-posta/telefon araması → sonuç yoksa unvanla aday araması → adayları normalleştir → durum + adayları döndür)
 
-Build the read-only `n8n → Odoo → res.partner` proof of concept.
+## Sonraki uygulama adımı
 
-Acceptance test:
+Salt okunur `n8n → Odoo → res.partner` kavram kanıtını kur.
+
+Kabul testi:
 
 ```text
 Given a known supplier VAT number
@@ -190,14 +196,16 @@ Then exactly the expected Odoo partner is returned
 And no Odoo data is modified.
 ```
 
-Then add tests for:
+(Bilinen bir tedarikçi VKN'si verildiğinde, n8n iş ortağı aramasını çağırınca tam olarak beklenen Odoo iş ortağı döner ve hiçbir Odoo verisi değişmez.)
 
-- customer-only partner
-- supplier-only partner
-- customer + supplier partner
-- duplicate/ambiguous name
-- missing VAT
-- inactive partner
-- multi-company partner
-- Odoo authentication failure
-- Odoo timeout
+Ardından şu testleri ekle:
+
+- yalnızca müşteri olan iş ortağı
+- yalnızca tedarikçi olan iş ortağı
+- müşteri + tedarikçi iş ortağı
+- mükerrer/belirsiz unvan
+- VKN eksik
+- pasif iş ortağı
+- çoklu şirket iş ortağı
+- Odoo kimlik doğrulama hatası
+- Odoo zaman aşımı

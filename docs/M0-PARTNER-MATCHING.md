@@ -1,10 +1,10 @@
-# M0 — Partner & Document Routing Design
+# M0 — İş Ortağı ve Belge Yönlendirme Tasarımı
 
-## Purpose
+## Amaç
 
-Define how n8nOdoo decides what an incoming document means and which Odoo partner/process it belongs to without allowing AI to make unsupported accounting decisions.
+n8nOdoo'nun gelen bir belgenin ne anlama geldiğine ve hangi Odoo iş ortağına/sürecine ait olduğuna, AI'ın dayanaksız muhasebe kararları vermesine izin vermeden nasıl karar verdiğini tanımlamak.
 
-## Core principle
+## Temel ilke
 
 ```text
 AI interpretation
@@ -18,38 +18,40 @@ transaction history
 validated routing decision
 ```
 
-AI produces candidates and extracted facts. Odoo data and deterministic rules validate them.
+(AI yorumu + Odoo ana verisi + işlem geçmişi + deterministik kurallar → doğrulanmış yönlendirme kararı)
 
-## Step 1 — Identify receiving company
+AI adaylar ve çıkarılmış gerçekler üretir. Odoo verisi ve deterministik kurallar bunları doğrular.
 
-The company must be determined from trusted context before creating an accounting record.
+## Adım 1 — Alıcı şirketi belirle
 
-Possible sources, in priority order:
+Muhasebe kaydı oluşturmadan önce şirket güvenilir bağlamdan belirlenmeli.
 
-1. Dedicated mailbox/channel configuration
-2. n8n workflow configuration
-3. Explicit document/company identifier
-4. Manual review if ambiguous
+Olası kaynaklar, öncelik sırasıyla:
 
-Do not infer company solely from an LLM guess when multiple companies are possible.
+1. Özel posta kutusu/kanal yapılandırması
+2. n8n iş akışı yapılandırması
+3. Belgede açık şirket tanımlayıcısı
+4. Belirsizse elle inceleme
 
-## Step 2 — Extract partner identifiers
+Birden fazla şirket mümkünken şirketi yalnızca LLM tahminine dayanarak çıkarma.
 
-Preferred identifiers:
+## Adım 2 — İş ortağı tanımlayıcılarını çıkar
 
-1. Turkish VKN/TCKN or applicable tax identifier
-2. E-invoice/e-document identifiers where available
-3. IBAN when relevant
-4. Email/domain
-5. Phone
-6. Normalized legal name
-7. Address
+Tercih edilen tanımlayıcılar:
 
-The system should preserve the original extracted value and the normalized value.
+1. Türk VKN/TCKN veya geçerli vergi tanımlayıcısı
+2. Varsa e-fatura/e-belge tanımlayıcıları
+3. İlgiliyse IBAN
+4. E-posta/alan adı
+5. Telefon
+6. Normalleştirilmiş ticari unvan
+7. Adres
 
-## Step 3 — Search Odoo partners
+Sistem, çıkarılan orijinal değeri ve normalleştirilmiş değeri birlikte saklamalı.
 
-Candidate matching should query Odoo using progressively weaker signals.
+## Adım 3 — Odoo iş ortaklarında ara
+
+Aday eşleştirme, Odoo'yu giderek zayıflayan sinyallerle sorgulamalı.
 
 ```text
 Exact tax ID
@@ -65,24 +67,26 @@ Email/domain/phone
 Manual review
 ```
 
-A weak name match must never silently override an exact conflicting tax identifier.
+(Birebir VKN → yoksa birebir harici/e-fatura tanımlayıcısı → yoksa bilinen banka hesabı / IBAN → yoksa normalleştirilmiş unvan + şirket bağlamı → yoksa e-posta/alan adı/telefon → elle inceleme)
 
-## Customer vs supplier
+Zayıf bir unvan eşleşmesi, çelişen birebir bir vergi tanımlayıcısını asla sessizce geçersiz kılmamalı.
 
-A partner can have both roles. Do not use a simple customer/supplier binary classification.
+## Müşteri ve tedarikçi
 
-Evaluate:
+Bir iş ortağı her iki role de sahip olabilir. Basit bir müşteri/tedarikçi ikili sınıflandırması kullanma.
 
-- supplier rank / vendor status
-- customer rank / customer status
-- existing vendor bills
-- existing customer invoices
-- purchase orders
-- sales orders
-- recent transaction history
-- document direction and channel
+Değerlendir:
 
-Example:
+- tedarikçi sırası / tedarikçi durumu
+- müşteri sırası / müşteri durumu
+- mevcut tedarikçi faturaları
+- mevcut müşteri faturaları
+- satın alma siparişleri
+- satış siparişleri
+- yakın tarihli işlem geçmişi
+- belge yönü ve kanal
+
+Örnek:
 
 ```text
 Partner exists as customer + supplier
@@ -96,9 +100,11 @@ PO / vendor history / supplier configuration
 Route to vendor invoice flow
 ```
 
-## Document classification
+(İş ortağı hem müşteri hem tedarikçi → gelen fatura → satın alma tarafı kanıtı ara → sipariş / tedarikçi geçmişi / tedarikçi yapılandırması → tedarikçi faturası akışına yönlendir)
 
-Initial document classes:
+## Belge sınıflandırma
+
+İlk belge sınıfları:
 
 - vendor_invoice
 - expense_invoice
@@ -115,50 +121,50 @@ Initial document classes:
 - support_request
 - unknown
 
-Classification should return both a type and confidence, but confidence alone does not authorize an accounting action.
+Sınıflandırma hem tür hem güven skoru döndürmeli; ancak güven skoru tek başına bir muhasebe işlemine yetki vermez.
 
-## Purchase vs expense invoice
+## Satın alma faturası ve gider faturası
 
-A vendor invoice is not automatically a purchase-order invoice.
+Bir tedarikçi faturası otomatik olarak satın alma siparişi faturası değildir.
 
-### Purchase-side evidence
+### Satın alma tarafı kanıtları
 
-Look for:
+Ara:
 
-- matching open/confirmed PO
-- matching supplier
-- matching product/service lines
-- matching quantities
-- matching prices within tolerance
-- expected purchase taxes
-- warehouse/purchase context
+- eşleşen açık/onaylı satın alma siparişi
+- eşleşen tedarikçi
+- eşleşen ürün/hizmet satırları
+- eşleşen miktarlar
+- tolerans içinde eşleşen fiyatlar
+- beklenen alış vergileri
+- depo/satın alma bağlamı
 
-### Expense-side evidence
+### Gider tarafı kanıtları
 
-Possible indicators:
+Olası göstergeler:
 
-- no relevant PO
-- recurring utility/telecom/rent/service supplier
-- supplier configured for expense categories
-- expense account/category history
-- document explicitly describing a general operating expense
+- ilgili satın alma siparişi yok
+- tekrarlayan elektrik-su/telekom/kira/hizmet tedarikçisi
+- gider kategorileri için yapılandırılmış tedarikçi
+- gider hesabı/kategori geçmişi
+- açıkça genel bir işletme giderini tarif eden belge
 
-If both routes remain plausible, create a manual-review task rather than guessing.
+Her iki yol da makul kalıyorsa tahmin etmek yerine elle inceleme görevi oluştur.
 
-## Purchase Order matching
+## Satın alma siparişi eşleştirme
 
-Candidate PO scoring can use:
+Aday sipariş puanlamasında kullanılabilecekler:
 
-- partner exact match
-- company exact match
-- currency match
-- product/service overlap
-- quantity compatibility
-- price compatibility
-- date proximity
-- PO state
+- iş ortağı birebir eşleşmesi
+- şirket birebir eşleşmesi
+- para birimi eşleşmesi
+- ürün/hizmet örtüşmesi
+- miktar uyumu
+- fiyat uyumu
+- tarih yakınlığı
+- sipariş durumu
 
-Example conceptual score:
+Kavramsal puan örneği:
 
 ```text
 partner exact       +40
@@ -171,58 +177,58 @@ price compatible    +10
 maximum             100
 ```
 
-These are design weights, not production thresholds. Thresholds must be configurable and tested against real documents.
+Bunlar tasarım ağırlıklarıdır, üretim eşikleri değil. Eşikler yapılandırılabilir olmalı ve gerçek belgelere karşı test edilmeli.
 
-## Invoice validation
+## Fatura doğrulaması
 
-Before creating a vendor bill:
+Tedarikçi faturası oluşturmadan önce:
 
-- supplier match is sufficiently strong
-- company is known
-- invoice number exists where required
-- duplicate search completed
-- currency is valid
-- tax configuration is valid
-- line totals reconcile
-- subtotal + tax = total within configured tolerance
-- PO match is either valid or explicitly not required
-- high-risk conditions are clear
+- tedarikçi eşleşmesi yeterince güçlü
+- şirket biliniyor
+- gerektiği yerde fatura numarası var
+- mükerrer araması tamamlandı
+- para birimi geçerli
+- vergi yapılandırması geçerli
+- satır toplamları tutuyor
+- ara toplam + vergi = toplam (yapılandırılan tolerans içinde)
+- sipariş eşleşmesi ya geçerli ya da açıkça gerekli değil
+- yüksek risk koşulları yok
 
-## Duplicate detection
+## Mükerrer tespiti
 
-Primary candidates:
+Birincil adaylar:
 
 ```text
 company + supplier + supplier_invoice_number
 ```
 
-Secondary signals:
+İkincil sinyaller:
 
-- invoice date
-- total
-- currency
-- document hash
-- source message ID
-- attachment hash
+- fatura tarihi
+- toplam
+- para birimi
+- belge hash'i
+- kaynak mesaj kimliği
+- ek hash'i
 
-Duplicates should be idempotently ignored or routed to review, never silently posted twice.
+Mükerrerler idempotent olarak yok sayılmalı veya incelemeye yönlendirilmeli; asla sessizce iki kez işlenmemeli.
 
-## Risk rules
+## Risk kuralları
 
-Always require human verification for at least:
+En azından şunlar için her zaman insan doğrulaması iste:
 
-- supplier bank-account change
-- conflicting tax identifiers
-- ambiguous company
-- ambiguous partner
-- duplicate suspicion
-- unusually high-value invoice according to company policy
-- PO/Invoice mismatch above configured tolerance
-- unsupported or unreadable document
+- tedarikçi banka hesabı değişikliği
+- çelişen vergi tanımlayıcıları
+- belirsiz şirket
+- belirsiz iş ortağı
+- mükerrer şüphesi
+- şirket politikasına göre olağandışı yüksek tutarlı fatura
+- yapılandırılan toleransın üstünde sipariş/fatura uyuşmazlığı
+- desteklenmeyen veya okunamayan belge
 
-## Decision object
+## Karar nesnesi
 
-The routing layer should produce a normalized decision such as:
+Yönlendirme katmanı şuna benzer normalleştirilmiş bir karar üretmeli:
 
 ```json
 {
@@ -249,60 +255,60 @@ The routing layer should produce a normalized decision such as:
 }
 ```
 
-This object is a proposal for workflow routing, not an accounting record.
+Bu nesne iş akışı yönlendirmesi için bir öneridir, muhasebe kaydı değildir.
 
-## Manual review
+## Elle inceleme
 
-Manual review must show:
+Elle inceleme şunları göstermeli:
 
-- original document
-- extracted fields
-- candidate Odoo partner(s)
-- relevant PO/SO candidates
-- validation failures
-- risk reasons
-- proposed action
+- orijinal belge
+- çıkarılan alanlar
+- aday Odoo iş ortak(lar)ı
+- ilgili satın alma/satış siparişi adayları
+- doğrulama hataları
+- risk gerekçeleri
+- önerilen işlem
 
-The reviewer can approve, reject or correct the proposed routing.
+İnceleyen kişi önerilen yönlendirmeyi onaylayabilir, reddedebilir veya düzeltebilir.
 
-## Implementation boundary
+## Uygulama sınırı
 
 ### n8n
 
-- receive/extract
-- call AI/OCR
-- call Odoo lookup APIs
-- combine candidate data
-- execute workflow routing
-- create approval request
-- retry/error handling
+- alma/veri çıkarma
+- AI/OCR çağırma
+- Odoo arama API'lerini çağırma
+- aday verileri birleştirme
+- iş akışı yönlendirmesini yürütme
+- onay talebi oluşturma
+- yeniden deneme/hata yönetimi
 
-### Odoo module
+### Odoo modülü
 
-- expose safe lookup methods where standard API calls are insufficient
-- hold normalized document, decision, approval and audit records
-- create/update final business records
-- enforce server-side validation for critical operations
+- standart API çağrılarının yetmediği yerde güvenli arama metotları sunmak
+- normalleştirilmiş belge, karar, onay ve denetim kayıtlarını tutmak
+- nihai iş kayıtlarını oluşturmak/güncellemek
+- kritik işlemler için sunucu tarafı doğrulamayı zorunlu kılmak
 
 ### AI
 
-- classify
-- extract
-- suggest candidate matches
-- explain extraction uncertainty
+- sınıflandırma
+- veri çıkarma
+- aday eşleşme önerme
+- veri çıkarma belirsizliğini açıklama
 
-AI must not directly create/post accounting entries.
+AI muhasebe kayıtlarını doğrudan oluşturmamalı/işlememeli.
 
-## Next implementation tasks
+## Sonraki uygulama görevleri
 
-- [ ] Define partner candidate API contract
-- [ ] Define normalized company context
-- [ ] Define partner matching normalization functions
-- [ ] Define PO candidate API
-- [ ] Define duplicate-check API
-- [ ] Define purchase-vs-expense rule configuration
-- [ ] Define risk policy configuration
-- [ ] Create routing decision JSON schema
-- [ ] Build test cases for customer+supplier dual-role partners
-- [ ] Build test cases for no-PO expense invoices
-- [ ] Build test cases for ambiguous partner matches
+- [ ] İş ortağı aday API sözleşmesini tanımla
+- [ ] Normalleştirilmiş şirket bağlamını tanımla
+- [ ] İş ortağı eşleştirme normalleştirme fonksiyonlarını tanımla
+- [ ] Satın alma siparişi aday API'sini tanımla
+- [ ] Mükerrer kontrol API'sini tanımla
+- [ ] Satın alma/gider kural yapılandırmasını tanımla
+- [ ] Risk politikası yapılandırmasını tanımla
+- [ ] Yönlendirme kararı JSON şemasını oluştur
+- [ ] Müşteri+tedarikçi çift rollü iş ortakları için test senaryoları yaz
+- [ ] Siparişsiz gider faturaları için test senaryoları yaz
+- [ ] Belirsiz iş ortağı eşleşmeleri için test senaryoları yaz

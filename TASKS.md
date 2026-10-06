@@ -1,133 +1,133 @@
-# Tasks
+# Görevler
 
-## M0 — Research
+## M0 — Araştırma
 
-### Reuse / dependency analysis
+### Yeniden kullanım / bağımlılık analizi
 
-- [ ] Inspect OCA DMS architecture
-- [ ] Inspect `dms_auto_classification`
-- [ ] Inspect Apexive `odoo-llm` architecture
-- [ ] Inspect `account_invoice_import_llm`
-- [ ] Inspect current n8n Odoo integration options
-- [ ] Inspect Odoo↔n8n bridge projects
-- [ ] Inspect WhatsApp↔n8n↔Odoo examples
-- [ ] Record Odoo 18 compatibility
-- [ ] Record license for every candidate
-- [ ] Record maintenance/activity
-- [ ] Record security considerations
-- [ ] Decide: reuse / fork / rewrite / avoid
+- [ ] OCA DMS mimarisini incele
+- [ ] `dms_auto_classification`'ı incele
+- [ ] Apexive `odoo-llm` mimarisini incele
+- [ ] `account_invoice_import_llm`'i incele
+- [ ] Güncel n8n Odoo entegrasyon seçeneklerini incele
+- [ ] Odoo↔n8n köprü projelerini incele
+- [ ] WhatsApp↔n8n↔Odoo örneklerini incele
+- [ ] Odoo 18 uyumluluğunu kaydet
+- [ ] Her adayın lisansını kaydet
+- [ ] Bakım/aktivite durumunu kaydet
+- [ ] Güvenlik değerlendirmelerini kaydet
+- [ ] Karar ver: yeniden kullan / fork et / yeniden yaz / kaçın
 
-### Architecture
+### Mimari
 
-- [ ] Freeze component boundaries
-- [ ] Define normalized document JSON
-- [ ] Define invoice JSON schema
-- [ ] Define validation contract
-- [ ] Define approval contract
-- [ ] Define audit event contract
-- [ ] Define idempotency strategy
-- [ ] Define error/dead-letter strategy
+- [ ] Bileşen sınırlarını dondur
+- [ ] Normalleştirilmiş belge JSON'unu tanımla
+- [ ] Fatura JSON şemasını tanımla
+- [ ] Doğrulama sözleşmesini tanımla
+- [ ] Onay sözleşmesini tanımla
+- [ ] Denetim olayı sözleşmesini tanımla
+- [ ] Idempotency stratejisini tanımla
+- [ ] Hata/dead-letter stratejisini tanımla
 
-## M1 — Repository
+## M1 — Depo
 
-- [ ] Finalize LICENSE
-- [ ] Add CONTRIBUTING.md
-- [ ] Add CI
-- [ ] Add docs directories
-- [ ] Add issue templates
-- [ ] Add security policy
+- [ ] LICENSE'ı kesinleştir
+- [ ] CONTRIBUTING.md ekle
+- [ ] CI ekle
+- [ ] Belge dizinlerini ekle
+- [ ] Issue şablonlarını ekle
+- [ ] Güvenlik politikası ekle
 
 ## M2 — Odoo
 
-- [ ] Create `intelligent_document` module
-- [ ] Create `intelligent.document`
-- [ ] Create states
-- [ ] Create security/access rules
-- [ ] Create attachment relation
-- [ ] Create workflow execution fields
-- [ ] Create audit model
-- [ ] Create approval model
-- [ ] Add tests
+- [ ] `intelligent_document` modülünü oluştur
+- [ ] `intelligent.document` modelini oluştur
+- [ ] Durumları oluştur
+- [ ] Güvenlik/erişim kurallarını oluştur
+- [ ] Ek ilişkisini oluştur
+- [ ] İş akışı çalıştırma alanlarını oluştur
+- [ ] Denetim modelini oluştur
+- [ ] Onay modelini oluştur
+- [ ] Test ekle
 
 ## M3 — n8n
 
-- [ ] Create email intake workflow
-- [ ] Create file validation subworkflow
-- [ ] Create Odoo lookup subworkflow
-- [ ] Create error handler
-- [ ] Create retry path
-- [ ] Create idempotency check
+- [ ] E-posta alım iş akışını oluştur
+- [ ] Dosya doğrulama alt iş akışını oluştur
+- [ ] Odoo arama alt iş akışını oluştur
+- [ ] Hata işleyicisini oluştur
+- [ ] Yeniden deneme yolunu oluştur
+- [ ] Idempotency kontrolünü oluştur
 
 ## M4 — AI/OCR
 
-- [ ] Select initial OCR provider
-- [ ] Select initial LLM provider
-- [ ] Define classification prompt
-- [ ] Define invoice extraction schema
-- [ ] Validate JSON schema
-- [ ] Handle low confidence
-- [ ] Add prompt-injection safeguards
+- [ ] İlk OCR sağlayıcısını seç
+- [ ] İlk LLM sağlayıcısını seç
+- [ ] Sınıflandırma prompt'unu tanımla
+- [ ] Fatura veri çıkarma şemasını tanımla
+- [ ] JSON şemasını doğrula
+- [ ] Düşük güven skorunu ele al
+- [ ] Prompt-injection önlemleri ekle
 
-## M5 — Invoice Rules
+## M5 — Fatura Kuralları
 
-- [ ] Partner matching
-- [ ] Duplicate detection
-- [ ] PO matching
-- [ ] Line matching
-- [ ] Total tolerance
-- [ ] Currency validation
-- [ ] Tax validation
-- [ ] Company validation
-- [ ] Bank-account-change high-risk rule
+- [ ] İş ortağı eşleştirme
+- [ ] Mükerrer tespiti
+- [ ] Satın alma siparişi eşleştirme
+- [ ] Satır eşleştirme
+- [ ] Toplam toleransı
+- [ ] Para birimi doğrulaması
+- [ ] Vergi doğrulaması
+- [ ] Şirket doğrulaması
+- [ ] Banka hesabı değişikliği yüksek risk kuralı
 
-## M6 — Approval
+## M6 — Onay
 
-- [ ] Approval request creation
-- [ ] Approver routing
-- [ ] Approval notification
-- [ ] Approval callback
-- [ ] Rejection path
-- [ ] Expiration/escalation
-- [ ] Audit approval decision
+- [ ] Onay talebi oluşturma
+- [ ] Onaylayıcıya yönlendirme
+- [ ] Onay bildirimi
+- [ ] Onay callback'i
+- [ ] Ret yolu
+- [ ] Süre dolumu/üst makama iletme
+- [ ] Onay kararının denetim kaydı
 
-## M7 — Vendor Bill
+## M7 — Tedarikçi Faturası
 
-- [ ] Create draft bill
-- [ ] Attach original document
-- [ ] Link source record
-- [ ] Prevent duplicate creation
-- [ ] Record audit event
+- [ ] Taslak fatura oluştur
+- [ ] Orijinal belgeyi ekle
+- [ ] Kaynak kayıtla bağla
+- [ ] Mükerrer oluşturmayı engelle
+- [ ] Denetim olayını kaydet
 
 ## M8 — DMS
 
-- [ ] Install/integrate OCA DMS
-- [ ] Define workspace/folder strategy
-- [ ] Define metadata
-- [ ] Archive original document
-- [ ] Link DMS file to Odoo document
+- [ ] OCA DMS'i kur/entegre et
+- [ ] Çalışma alanı/klasör stratejisini tanımla
+- [ ] Meta veriyi tanımla
+- [ ] Orijinal belgeyi arşivle
+- [ ] DMS dosyasını Odoo belgesine bağla
 
-## M9 — Quality
+## M9 — Kalite
 
-- [ ] Unit tests
-- [ ] Integration tests
-- [ ] End-to-end invoice test
-- [ ] Duplicate invoice test
-- [ ] Unreadable document test
-- [ ] Wrong supplier test
-- [ ] PO mismatch test
-- [ ] Approval bypass test
-- [ ] Retry/idempotency test
-- [ ] Security test
-- [ ] Performance baseline
+- [ ] Birim testleri
+- [ ] Entegrasyon testleri
+- [ ] Uçtan uca fatura testi
+- [ ] Mükerrer fatura testi
+- [ ] Okunamayan belge testi
+- [ ] Yanlış tedarikçi testi
+- [ ] Satın alma siparişi uyuşmazlığı testi
+- [ ] Onay atlatma testi
+- [ ] Yeniden deneme/idempotency testi
+- [ ] Güvenlik testi
+- [ ] Performans referans ölçümü
 
-## Future
+## Gelecek
 
-- [ ] Expense documents
-- [ ] Payment receipts
-- [ ] Sales orders
-- [ ] Quote requests
-- [ ] Delivery notes
+- [ ] Gider belgeleri
+- [ ] Ödeme dekontları
+- [ ] Satış siparişleri
+- [ ] Teklif talepleri
+- [ ] İrsaliyeler
 - [ ] WhatsApp
-- [ ] Voice
-- [ ] Contracts
-- [ ] Legal/official documents
+- [ ] Ses
+- [ ] Sözleşmeler
+- [ ] Hukuki/resmî belgeler

@@ -1,6 +1,6 @@
-# Architecture
+# Mimari
 
-## System flow
+## Sistem akışı
 
 ```
 Email / WhatsApp / Web / API
@@ -45,94 +45,96 @@ Email / WhatsApp / Web / API
       DMS      Audit
 ```
 
-## Responsibility boundaries
+(E-posta / WhatsApp / Web / API → n8n → belge alımı → OCR / görüntü → AI sınıflandırma → yapılandırılmış JSON → Odoo araması (iş ortağı + satın alma siparişi) → deterministik kurallar → otomatik veya onaylı → Odoo → DMS ve denetim kaydı)
+
+## Sorumluluk sınırları
 
 ### n8n
 
-- Channel integration
-- Workflow orchestration
-- Retry/timeout handling
-- Routing
-- Calling OCR/AI services
-- Calling Odoo
-- Approval notifications
+- Kanal entegrasyonu
+- İş akışı orkestrasyonu
+- Yeniden deneme/zaman aşımı yönetimi
+- Yönlendirme
+- OCR/AI servislerini çağırma
+- Odoo'yu çağırma
+- Onay bildirimleri
 
 ### Odoo
 
-- Master/business data
-- Partners, products, orders and accounting records
-- Authoritative validation data
-- Final business records
-- Approval state where appropriate
+- Ana/iş verileri
+- İş ortakları, ürünler, siparişler ve muhasebe kayıtları
+- Yetkili doğrulama verisi
+- Nihai iş kayıtları
+- Uygun olduğunda onay durumu
 
 ### AI
 
-- Classification
-- OCR/vision interpretation
-- Structured extraction
-- Entity matching suggestions
-- Never the final authority for accounting/business facts
+- Sınıflandırma
+- OCR/görüntü yorumlama
+- Yapılandırılmış veri çıkarma
+- Varlık eşleştirme önerileri
+- Muhasebe/iş gerçekleri için asla nihai otorite değildir
 
-### Rules
+### Kurallar
 
-Rules must be deterministic and independently testable.
+Kurallar deterministik ve bağımsız olarak test edilebilir olmalıdır.
 
-Examples:
+Örnekler:
 
-- supplier exists
-- invoice number is present
-- invoice is not a duplicate
-- PO exists
-- PO and invoice totals are within configured tolerance
-- company/currency/tax conditions are valid
-- supplier bank-account changes always require human verification
+- tedarikçi mevcut
+- fatura numarası var
+- fatura mükerrer değil
+- satın alma siparişi mevcut
+- sipariş ve fatura toplamları yapılandırılan tolerans içinde
+- şirket/para birimi/vergi koşulları geçerli
+- tedarikçi banka hesabı değişiklikleri her zaman insan doğrulaması gerektirir
 
 ### DMS
 
-The original document and relevant metadata are archived. OCA DMS is the primary candidate for reuse.
+Orijinal belge ve ilgili meta veriler arşivlenir. Yeniden kullanım için birincil aday OCA DMS'tir.
 
-### Audit
+### Denetim
 
-Record:
+Kaydedilecekler:
 
-- source channel
-- source message/document ID
-- workflow ID
-- n8n execution ID
-- timestamps
-- extracted payload
-- validation results
-- approval decisions
-- Odoo record IDs
-- errors and retries
+- kaynak kanal
+- kaynak mesaj/belge kimliği
+- iş akışı kimliği
+- n8n çalıştırma kimliği
+- zaman damgaları
+- çıkarılan veri
+- doğrulama sonuçları
+- onay kararları
+- Odoo kayıt kimlikleri
+- hatalar ve yeniden denemeler
 
 ## Idempotency
 
-Vendor invoices should use a deterministic duplicate key such as:
+Tedarikçi faturaları aşağıdaki gibi deterministik bir mükerrer anahtarı kullanmalı:
 
 `company + document_type + supplier_tax_id + invoice_number + invoice_date`
 
-Document hashes and source-message IDs should also be retained where available.
+Mümkün olduğunda belge hash'leri ve kaynak mesaj kimlikleri de saklanmalı.
 
-## Security
+## Güvenlik
 
-- Least-privilege credentials
-- Secure webhooks
-- Upload validation
-- Malicious-file controls
-- Prompt-injection defense
-- PII/KVKK controls
-- Approval controls for high-risk actions
-- No automatic supplier bank-account changes
-- Full audit trail
+- En az yetkili kimlik bilgileri
+- Güvenli webhook'lar
+- Yükleme doğrulaması
+- Zararlı dosya kontrolleri
+- Prompt-injection savunması
+- Kişisel veri/KVKK kontrolleri
+- Yüksek riskli işlemler için onay kontrolleri
+- Tedarikçi banka hesabında otomatik değişiklik yok
+- Tam denetim kaydı
 
-## Proposed Odoo module
+## Önerilen Odoo modülü
 
 `intelligent_document`
 
-Main model: `intelligent.document`
+Ana model: `intelligent.document`
 
-Suggested fields:
+Önerilen alanlar:
 
 - name
 - source_channel
@@ -153,23 +155,23 @@ Suggested fields:
 - created_at
 - processed_at
 
-State machine:
+Durum makinesi:
 
 `received → processing → classified → extracted → validated → approval_required → approved → completed`
 
-Alternative terminal/error states:
+Alternatif son/hata durumları:
 
 `rejected`, `failed`, `manual_review`, `cancelled`
 
-## External project reuse
+## Harici proje yeniden kullanımı
 
-The first candidates for inspection are:
+İncelenecek ilk adaylar:
 
-- OCA DMS — likely reuse
-- Apexive odoo-llm — evaluate selective reuse/reference
-- invoice AI import modules — evaluate
-- current n8n/Odoo integration options — evaluate before writing a custom node
-- Odoo↔n8n bridge projects — evaluate
-- WhatsApp↔n8n↔Odoo examples — evaluate
+- OCA DMS — büyük olasılıkla yeniden kullanılacak
+- Apexive odoo-llm — seçici yeniden kullanım/referans olarak değerlendir
+- fatura AI içe aktarma modülleri — değerlendir
+- güncel n8n/Odoo entegrasyon seçenekleri — özel node yazmadan önce değerlendir
+- Odoo↔n8n köprü projeleri — değerlendir
+- WhatsApp↔n8n↔Odoo örnekleri — değerlendir
 
-No external dependency should be adopted before checking Odoo 18 compatibility, license, security, maintenance status and architectural fit.
+Odoo 18 uyumluluğu, lisans, güvenlik, bakım durumu ve mimari uyum kontrol edilmeden hiçbir harici bağımlılık benimsenmemeli.

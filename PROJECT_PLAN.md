@@ -1,169 +1,169 @@
-# Project Plan
+# Proje Planı
 
-## Phase 0 — M0: Architecture & Research
+## Aşama 0 — M0: Mimari ve Araştırma
 
-Goal: decide what to reuse, fork, rewrite or avoid before coding.
+Hedef: kodlamadan önce neyin yeniden kullanılacağına, fork edileceğine, yeniden yazılacağına veya kaçınılacağına karar vermek.
 
-### Deliverables
+### Çıktılar
 
-1. Dependency/reuse matrix
-2. License compatibility matrix
-3. Odoo 18 compatibility matrix
-4. Security review notes
-5. Final architecture
-6. MVP technical specification
+1. Bağımlılık/yeniden kullanım matrisi
+2. Lisans uyumluluk matrisi
+3. Odoo 18 uyumluluk matrisi
+4. Güvenlik inceleme notları
+5. Nihai mimari
+6. MVP teknik şartnamesi
 
-### Research targets
+### Araştırma hedefleri
 
 - OCA DMS
-- OCA DMS auto-classification
+- OCA DMS otomatik sınıflandırma
 - Apexive odoo-llm
-- account invoice AI/import modules
-- n8n Odoo nodes
-- Odoo↔n8n bridges
-- WhatsApp↔n8n↔Odoo examples
+- fatura AI/içe aktarma modülleri
+- n8n Odoo node'ları
+- Odoo↔n8n köprüleri
+- WhatsApp↔n8n↔Odoo örnekleri
 
-## Phase 1 — M1: Repository Foundation
+## Aşama 1 — M1: Depo Temeli
 
-- Finalize repository license
-- Add contribution rules
-- Add documentation structure
-- Add CI skeleton
-- Define coding/testing conventions
-- Define versioning strategy
+- Depo lisansını kesinleştir
+- Katkı kurallarını ekle
+- Belge yapısını ekle
+- CI iskeletini ekle
+- Kodlama/test kurallarını tanımla
+- Sürümleme stratejisini tanımla
 
-## Phase 2 — M2: Odoo Integration
+## Aşama 2 — M2: Odoo Entegrasyonu
 
-Build the smallest possible integration:
+Mümkün olan en küçük entegrasyonu kur:
 
 ```
 n8n → Odoo 18 → search partner → JSON response
 ```
 
-Requirements:
+Gereksinimler:
 
-- authentication
-- least privilege
-- error normalization
-- timeout handling
-- connection tests
+- kimlik doğrulama
+- en az yetki
+- hata normalleştirme
+- zaman aşımı yönetimi
+- bağlantı testleri
 
-## Phase 3 — M3: Document Intake
+## Aşama 3 — M3: Belge Alımı
 
 ```
 Email → n8n → PDF/image → intelligent.document
 ```
 
-Requirements:
+Gereksinimler:
 
-- file validation
-- source metadata
+- dosya doğrulama
+- kaynak meta verisi
 - idempotency
-- safe attachment handling
-- processing state
+- güvenli ek işleme
+- işleme durumu
 
-## Phase 4 — M4: AI Processing
+## Aşama 4 — M4: AI İşleme
 
 ```
 Document → OCR/Vision → Classification → Structured JSON
 ```
 
-Requirements:
+Gereksinimler:
 
-- versioned schemas
-- provider abstraction
-- confidence score
-- malformed-output handling
-- prompt-injection defenses
-- no direct AI→Odoo write path
+- sürümlü şemalar
+- sağlayıcı soyutlaması
+- güven skoru
+- bozuk çıktı yönetimi
+- prompt-injection savunmaları
+- AI'dan Odoo'ya doğrudan yazma yolu yok
 
-## Phase 5 — M5: Validation
+## Aşama 5 — M5: Doğrulama
 
-Validate against Odoo:
+Odoo'ya karşı doğrula:
 
-- partner
-- company
-- currency
-- PO
-- invoice number
-- totals
-- lines
-- tax
-- duplicate status
+- iş ortağı
+- şirket
+- para birimi
+- satın alma siparişi
+- fatura numarası
+- toplamlar
+- satırlar
+- vergi
+- mükerrerlik durumu
 
-Separate AI confidence from business validation.
+AI güven skorunu iş doğrulamasından ayır.
 
-## Phase 6 — M6: Approval
+## Aşama 6 — M6: Onay
 
-Create approval records with:
+Şunları içeren onay kayıtları oluştur:
 
-- document
+- belge
 - risk
-- reason
-- proposed action
-- requester
-- approver
-- timestamps
-- decision
+- gerekçe
+- önerilen işlem
+- talep eden
+- onaylayan
+- zaman damgaları
+- karar
 
-High-risk actions must not bypass approval.
+Yüksek riskli işlemler onayı atlamamalı.
 
-## Phase 7 — M7: Odoo Vendor Bill
+## Aşama 7 — M7: Odoo Tedarikçi Faturası
 
-After successful validation/approval:
+Başarılı doğrulama/onaydan sonra:
 
-- create draft vendor bill
-- attach original document
-- link intelligent.document
-- write audit event
-- guarantee idempotency
+- taslak tedarikçi faturası oluştur
+- orijinal belgeyi ekle
+- intelligent.document ile bağla
+- denetim olayı yaz
+- idempotency'yi garanti et
 
-## Phase 8 — M8: DMS + Audit
+## Aşama 8 — M8: DMS + Denetim
 
-- archive original file
-- retain metadata
-- record every workflow transition
-- support manual retry
-- support failed/dead-letter cases
+- orijinal dosyayı arşivle
+- meta veriyi sakla
+- her iş akışı geçişini kaydet
+- elle yeniden denemeyi destekle
+- başarısız/dead-letter durumlarını destekle
 
-## Phase 9 — M9: Test & Hardening
+## Aşama 9 — M9: Test ve Sıkılaştırma
 
-- unit tests
-- integration tests
-- workflow tests
-- duplicate tests
-- malformed document tests
-- security tests
-- approval bypass tests
-- retry/idempotency tests
-- performance baseline
+- birim testleri
+- entegrasyon testleri
+- iş akışı testleri
+- mükerrer kayıt testleri
+- bozuk belge testleri
+- güvenlik testleri
+- onay atlatma testleri
+- yeniden deneme/idempotency testleri
+- performans referans ölçümü
 
-## Phase 10 — M10: Additional Scenarios
+## Aşama 10 — M10: Ek Senaryolar
 
-Expand only after the invoice flow is stable:
+Yalnızca fatura akışı kararlı hale geldikten sonra genişlet:
 
-1. expense invoice
-2. payment receipt
-3. sales order
-4. quote request
-5. delivery note
+1. gider faturası
+2. ödeme dekontu
+3. satış siparişi
+4. teklif talebi
+5. irsaliye
 6. WhatsApp
-7. voice
-8. legal/contract documents
+7. ses
+8. hukuki/sözleşme belgeleri
 
-## Definition of Done for v0.1
+## v0.1 için Tamamlanma Tanımı
 
-A supplier invoice arriving by email can be:
+E-postayla gelen bir tedarikçi faturası:
 
-1. received safely
-2. stored
-3. classified
-4. OCR'd/extracted
-5. matched to an Odoo partner
-6. matched to a PO when available
-7. validated deterministically
-8. routed to approval when required
-9. converted to a draft vendor bill
-10. archived in DMS
-11. fully audited
-12. safely retried without creating duplicates
+1. güvenli şekilde alınabilir
+2. saklanabilir
+3. sınıflandırılabilir
+4. OCR'dan geçirilip verisi çıkarılabilir
+5. bir Odoo iş ortağıyla eşleştirilebilir
+6. varsa bir satın alma siparişiyle eşleştirilebilir
+7. deterministik olarak doğrulanabilir
+8. gerektiğinde onaya yönlendirilebilir
+9. taslak tedarikçi faturasına dönüştürülebilir
+10. DMS'te arşivlenebilir
+11. tamamen denetlenebilir
+12. mükerrer kayıt oluşturmadan güvenle yeniden denenebilir

@@ -1,42 +1,42 @@
 # n8nOdoo
 
-Open-source intelligent document and business-process automation platform for Odoo 18, orchestrated by n8n.
+Odoo 18 için n8n ile orkestre edilen, açık kaynaklı akıllı belge ve iş süreci otomasyon platformu.
 
-> **AI reads. Odoo knows. Rules validate. Human approves when necessary. n8n orchestrates. DMS stores. Audit proves.**
+> **AI okur. Odoo bilir. Kurallar doğrular. Gerektiğinde insan onaylar. n8n orkestre eder. DMS saklar. Denetim kaydı kanıtlar.**
 
-## Vision
+## Vizyon
 
-Connect Email, WhatsApp, Web and API inputs to Odoo through a secure, auditable workflow engine. AI is used for classification, OCR and structured extraction; deterministic rules and Odoo master data remain authoritative.
+E-posta, WhatsApp, Web ve API girdilerini güvenli, denetlenebilir bir iş akışı motoruyla Odoo'ya bağlamak. AI sınıflandırma, OCR ve yapılandırılmış veri çıkarma için kullanılır; belirleyici (deterministik) kurallar ve Odoo ana verileri yetkili kaynak olarak kalır.
 
-## First production slice
+## İlk üretim dilimi
 
-**Email → Supplier Invoice → OCR/AI → Odoo Partner/PO validation → Approval → Draft Vendor Bill → DMS → Audit**
+**E-posta → Tedarikçi Faturası → OCR/AI → Odoo İş Ortağı/Satın Alma Siparişi doğrulaması → Onay → Taslak Tedarikçi Faturası → DMS → Denetim**
 
-## Principles
+## İlkeler
 
-- n8n is the orchestrator, not the accounting/business-rule authority.
-- Odoo is the source of truth for partners, products, orders, invoices and company data.
-- AI extracts and interprets; it must not invent business facts.
-- Validation rules are deterministic and independently testable.
-- High-risk actions require human approval.
-- Original documents are retained in DMS.
-- Every processing step is auditable and idempotent.
-- Document content must never be treated as system instructions.
+- n8n orkestratördür; muhasebe/iş kuralı otoritesi değildir.
+- Odoo; iş ortakları, ürünler, siparişler, faturalar ve şirket verileri için tek doğruluk kaynağıdır.
+- AI veri çıkarır ve yorumlar; iş gerçeği uyduramaz.
+- Doğrulama kuralları deterministiktir ve bağımsız olarak test edilebilir.
+- Yüksek riskli işlemler insan onayı gerektirir.
+- Orijinal belgeler DMS'te saklanır.
+- Her işleme adımı denetlenebilir ve idempotenttir.
+- Belge içeriği asla sistem talimatı olarak ele alınmaz.
 
-## Planned components
+## Planlanan bileşenler
 
-- Odoo 18 custom module: `intelligent_document`
-- n8n workflows and reusable sub-workflows
-- OCA DMS for document storage/classification
-- Pluggable OCR/LLM providers
-- JSON schemas for normalized document data
-- Rule and approval engine
-- Audit and idempotency layer
+- Odoo 18 özel modülü: `intelligent_document`
+- n8n iş akışları ve yeniden kullanılabilir alt iş akışları
+- Belge saklama/sınıflandırma için OCA DMS
+- Takılıp çıkarılabilir OCR/LLM sağlayıcıları
+- Normalleştirilmiş belge verisi için JSON şemaları
+- Kural ve onay motoru
+- Denetim ve idempotency katmanı
 
-## Status
+## Durum
 
-The repository starts with architecture and research. Implementation begins after the reuse/fork/rewrite assessment in M0.
+Depo mimari ve araştırmayla başlıyor. Uygulama, M0'daki yeniden kullan/fork et/yeniden yaz değerlendirmesinden sonra başlar.
 
-## License
+## Lisans
 
-License will be finalized before the first implementation release after dependency/license compatibility review.
+Lisans, bağımlılık/lisans uyumluluk incelemesinden sonra ilk uygulama sürümünden önce kesinleştirilecek.

@@ -1,32 +1,32 @@
-# M0 — account_invoice_import_llm Analysis
+# M0 — account_invoice_import_llm Analizi
 
-## Source
+## Kaynak
 
-Apexive `odoo-llm`, module `account_invoice_import_llm`, Odoo 18.
+Apexive `odoo-llm`, `account_invoice_import_llm` modülü, Odoo 18.
 
-## What the module already solves
+## Modülün zaten çözdükleri
 
-The module provides a useful reference implementation for the first MVP:
+Modül, ilk MVP için yararlı bir referans uygulama sunuyor:
 
-- PDF/image invoice extraction
+- PDF/görüntü faturadan veri çıkarma
 - Mistral OCR
-- structured invoice extraction
-- vendor name/VAT extraction
-- invoice number and dates
-- currency
-- subtotal/tax/total
-- invoice lines
-- OCA `account_invoice_import` integration
-- manual processing of a draft invoice
-- fallback parsing when embedded XML is unavailable
+- yapılandırılmış fatura verisi çıkarma
+- tedarikçi adı/VKN çıkarma
+- fatura numarası ve tarihleri
+- para birimi
+- ara toplam/vergi/toplam
+- fatura satırları
+- OCA `account_invoice_import` entegrasyonu
+- taslak faturanın elle işlenmesi
+- gömülü XML yoksa yedek ayrıştırma
 
-The module uses an explicit structured schema and converts the extracted result into OCA Invoice Pivot Format.
+Modül açık, yapılandırılmış bir şema kullanıyor ve çıkarılan sonucu OCA Invoice Pivot Format'a dönüştürüyor.
 
-## Important architectural observation
+## Önemli mimari gözlem
 
-The existing module is **Odoo-centric**: the document reaches an Odoo invoice/import wizard first, then OCR and LLM extraction happen inside Odoo.
+Mevcut modül **Odoo merkezli**: belge önce bir Odoo fatura/içe aktarma sihirbazına ulaşıyor, ardından OCR ve LLM veri çıkarma Odoo içinde gerçekleşiyor.
 
-Our project is intentionally **n8n-centric**:
+Bizim projemiz bilinçli olarak **n8n merkezli**:
 
 ```text
 Email / WhatsApp / Web
@@ -46,32 +46,34 @@ Approval when required
 Odoo record
 ```
 
-Therefore we should not simply copy the module into our project.
+(E-posta / WhatsApp / Web → n8n → belge alımı → OCR / AI → normalleştirilmiş JSON → Odoo araması + deterministik doğrulama → gerektiğinde onay → Odoo kaydı)
 
-## Reuse decision
+Bu nedenle modülü projemize olduğu gibi kopyalamamalıyız.
 
-### REUSE AS REFERENCE
+## Yeniden kullanım kararı
 
-Reuse the following concepts:
+### REFERANS OLARAK YENİDEN KULLAN
 
-1. Structured invoice JSON schema
-2. OCR → structured extraction flow
-3. OCA Invoice Pivot Format mapping
-4. Provider abstraction
-5. Fallback from direct document annotation to OCR text + LLM
-6. Explicit validation/error handling
+Şu kavramları yeniden kullan:
 
-### POSSIBLE DIRECT DEPENDENCY
+1. Yapılandırılmış fatura JSON şeması
+2. OCR → yapılandırılmış veri çıkarma akışı
+3. OCA Invoice Pivot Format eşlemesi
+4. Sağlayıcı soyutlaması
+5. Doğrudan belge işaretlemesinden OCR metni + LLM'e yedek geçiş
+6. Açık doğrulama/hata yönetimi
 
-Evaluate using `account_invoice_import_llm` directly in an Odoo deployment where the normal OCA invoice-import workflow is desired.
+### OLASI DOĞRUDAN BAĞIMLILIK
 
-For the n8nOdoo platform, keep the dependency optional rather than making the n8n workflow depend on an Odoo UI wizard.
+Normal OCA fatura içe aktarma iş akışının istendiği bir Odoo kurulumunda `account_invoice_import_llm`'i doğrudan kullanmayı değerlendir.
 
-### DO NOT COPY
+n8nOdoo platformu için n8n iş akışını bir Odoo arayüz sihirbazına bağımlı kılmak yerine bu bağımlılığı isteğe bağlı tut.
 
-Do not copy the entire Odoo-centric processing flow into n8nOdoo. In particular, the platform should not require users to first create a draft invoice and then click "Process with AI".
+### KOPYALAMA
 
-## Proposed n8nOdoo adaptation
+Odoo merkezli işleme akışının tamamını n8nOdoo'ya kopyalama. Özellikle platform, kullanıcıların önce taslak fatura oluşturup sonra "Process with AI"a tıklamasını gerektirmemeli.
+
+## Önerilen n8nOdoo uyarlaması
 
 ```text
 1. Email receives PDF
@@ -88,9 +90,22 @@ Do not copy the entire Odoo-centric processing flow into n8nOdoo. In particular,
 12. Audit event is recorded
 ```
 
-## Key design improvement for our project
+1. E-postayla PDF gelir.
+2. n8n `intelligent.document` oluşturur.
+3. n8n kaynak meta verisini/orijinal dosyayı saklar.
+4. OCR sağlayıcısı baytları işler.
+5. LLM normalleştirilmiş fatura JSON'u döndürür.
+6. n8n JSON şemasını doğrular.
+7. Odoo araması aday tedarikçiyi bulur.
+8. Deterministik kurallar tedarikçi/sipariş/tutar/vergi/para birimini doğrular.
+9. Risk motoru otomatik mi onaylı mı olacağına karar verir.
+10. Odoo taslak tedarikçi faturası yalnızca doğrulama/onaydan sonra oluşturulur.
+11. Orijinal PDF DMS'te arşivlenir.
+12. Denetim olayı kaydedilir.
 
-The existing module maps AI output to OCA Invoice Pivot Format. We should introduce an intermediate, provider-neutral contract instead:
+## Projemiz için temel tasarım iyileştirmesi
+
+Mevcut modül AI çıktısını OCA Invoice Pivot Format'a eşliyor. Bunun yerine ara, sağlayıcıdan bağımsız bir sözleşme getirmeliyiz:
 
 ```json
 {
@@ -117,27 +132,27 @@ The existing module maps AI output to OCA Invoice Pivot Format. We should introd
 }
 ```
 
-Only the Odoo adapter should convert this contract into Odoo/OCA-specific structures.
+Bu sözleşmeyi Odoo/OCA'ya özgü yapılara yalnızca Odoo adaptörü dönüştürmeli.
 
-## Critical validation rules
+## Kritik doğrulama kuralları
 
-AI extraction is not business validation.
+AI ile veri çıkarma, iş doğrulaması değildir.
 
-At minimum:
+En azından:
 
-- supplier tax ID/name must be matched against Odoo
-- invoice number must be checked for duplicates
-- company must be determined from the receiving context
-- currency must be validated
-- PO should be matched when available
-- quantities and prices should be compared with the PO
-- tax rates should be validated against configured Odoo taxes
-- totals should be recalculated and compared with extracted values
-- suspicious supplier bank-account changes require human verification
+- tedarikçi VKN'si/adı Odoo'ya karşı eşleştirilmeli
+- fatura numarası mükerrerlik açısından kontrol edilmeli
+- şirket, alım bağlamından belirlenmeli
+- para birimi doğrulanmalı
+- varsa satın alma siparişi eşleştirilmeli
+- miktarlar ve fiyatlar siparişle karşılaştırılmalı
+- vergi oranları Odoo'da yapılandırılmış vergilere karşı doğrulanmalı
+- toplamlar yeniden hesaplanıp çıkarılan değerlerle karşılaştırılmalı
+- şüpheli tedarikçi banka hesabı değişiklikleri insan doğrulaması gerektirir
 
-## Fallback strategy
+## Yedek strateji
 
-The Apexive implementation has a useful two-level strategy:
+Apexive uygulamasında yararlı iki seviyeli bir strateji var:
 
 ```text
 Direct document annotation
@@ -147,10 +162,12 @@ OCR text
 LLM structured extraction
 ```
 
-We should preserve this concept at the workflow level.
+(Doğrudan belge işaretleme → hata/yoksa → OCR metni → LLM ile yapılandırılmış veri çıkarma)
 
-## MVP conclusion
+Bu kavramı iş akışı seviyesinde korumalıyız.
 
-`account_invoice_import_llm` substantially reduces the amount of invoice-OCR research we need to do. It should be treated as a **reference implementation and optional Odoo-side component**, while n8nOdoo owns intake, routing, validation, approval, idempotency and audit orchestration.
+## MVP sonucu
 
-Next M0 task: inspect the underlying OCA `account_invoice_import` contract and the exact Odoo models/fields used by the Apexive adapter before defining our normalized `invoice.schema.json`.
+`account_invoice_import_llm` yapmamız gereken fatura-OCR araştırmasını önemli ölçüde azaltıyor. **Referans uygulama ve isteğe bağlı Odoo tarafı bileşen** olarak ele alınmalı; alım, yönlendirme, doğrulama, onay, idempotency ve denetim orkestrasyonu n8nOdoo'ya aittir.
+
+Sonraki M0 görevi: normalleştirilmiş `invoice.schema.json`'u tanımlamadan önce altta yatan OCA `account_invoice_import` sözleşmesini ve Apexive adaptörünün kullandığı Odoo model/alanlarını incele.

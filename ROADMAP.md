@@ -1,61 +1,61 @@
-# Roadmap
+# Yol Haritası
 
-## v0.1 — Intelligent Vendor Invoice Processing
+## v0.1 — Akıllı Tedarikçi Faturası İşleme
 
-- Email intake
-- PDF/image handling
+- E-posta ile alım
+- PDF/görüntü işleme
 - OCR
-- AI document classification
-- Structured invoice extraction
-- Odoo partner matching
-- Purchase order matching
-- Basic line/amount validation
-- Approval workflow
-- Draft vendor bill creation
-- DMS archival
-- Audit trail
-- Retry/error handling
-- Duplicate and idempotency protection
+- AI ile belge sınıflandırma
+- Yapılandırılmış fatura verisi çıkarma
+- Odoo iş ortağı eşleştirme
+- Satın alma siparişi eşleştirme
+- Temel satır/tutar doğrulaması
+- Onay iş akışı
+- Taslak tedarikçi faturası oluşturma
+- DMS arşivleme
+- Denetim kaydı
+- Yeniden deneme/hata yönetimi
+- Mükerrer kayıt ve idempotency koruması
 
-## v0.2 — Finance Documents
+## v0.2 — Finans Belgeleri
 
-- Expense invoice
-- Expense receipt
-- Payment/EFT receipt
-- Duplicate invoice detection
-- Bank statement intake
+- Gider faturası
+- Gider fişi
+- Ödeme/EFT dekontu
+- Mükerrer fatura tespiti
+- Banka ekstresi alımı
 
-## v0.3 — Sales Documents
+## v0.3 — Satış Belgeleri
 
-- Sales order
-- Quote request
-- Delivery note
-- Return request
+- Satış siparişi
+- Teklif talebi
+- İrsaliye
+- İade talebi
 
 ## v0.4 — WhatsApp
 
-- WhatsApp intake
-- Customer questions
-- Balance/payment queries
-- Order queries
-- Structured sales requests
+- WhatsApp ile alım
+- Müşteri soruları
+- Bakiye/ödeme sorguları
+- Sipariş sorguları
+- Yapılandırılmış satış talepleri
 
-## v0.5 — Advanced Documents
+## v0.5 — Gelişmiş Belgeler
 
-- Voice messages
-- Contracts
-- Legal/official documents
-- Deadline and renewal tracking
+- Sesli mesajlar
+- Sözleşmeler
+- Hukuki/resmî belgeler
+- Son tarih ve yenileme takibi
 
-## v1.0 — Reusable Automation Platform
+## v1.0 — Yeniden Kullanılabilir Otomasyon Platformu
 
-- Multi-company support
-- Configurable document types
-- Configurable rules
-- Configurable approval policies
-- Pluggable AI/OCR providers
-- Monitoring
-- Security hardening
-- Complete auditability
-- Production deployment documentation
-- Reusable n8n workflow templates
+- Çoklu şirket desteği
+- Yapılandırılabilir belge türleri
+- Yapılandırılabilir kurallar
+- Yapılandırılabilir onay politikaları
+- Takılıp çıkarılabilir AI/OCR sağlayıcıları
+- İzleme
+- Güvenlik sıkılaştırması
+- Tam denetlenebilirlik
+- Üretim kurulum belgeleri
+- Yeniden kullanılabilir n8n iş akışı şablonları

@@ -1,9 +1,9 @@
 # BACKLOG.md — n8nOdoo
 
-Unscheduled ideas. Planned scope lives in `ROADMAP.md` (v0.1 vendor invoices → v0.2 finance documents → v0.3 sales documents → v0.4 WhatsApp) and `TASKS.md`.
+Planlanmamış fikirler. Planlı kapsam `ROADMAP.md` (v0.1 tedarikçi faturaları → v0.2 finans belgeleri → v0.3 satış belgeleri → v0.4 WhatsApp) ve `TASKS.md` içinde.
 
-- Turkish e-Fatura UBL-TR XML as an input channel: parse structured XML directly instead of OCR when the supplier sends e-Fatura (reuse knowledge from `l10n_tr_sovos_efatura`).
-- Local/self-hosted OCR + LLM provider option (data privacy), e.g. PaddleOCR / TrOCR experience from `trocr-faz1`, local LLM via Ollama.
-- Confidence-based routing: auto-post only above a threshold, otherwise approval queue.
-- Re-use the WhatsApp gateway modules already on the Odoo server (`mail_gateway_whatsapp`, `wa_erp_bot`) for v0.4.
-- Metrics dashboard: documents per channel, auto vs approved ratio, extraction error rate.
+- Girdi kanalı olarak Türk e-Fatura UBL-TR XML'i: tedarikçi e-Fatura gönderdiğinde OCR yerine yapılandırılmış XML'i doğrudan ayrıştır (`l10n_tr_sovos_efatura` bilgisini yeniden kullan).
+- Yerel/kendi sunucusunda OCR + LLM sağlayıcı seçeneği (veri gizliliği), örn. `trocr-faz1`'deki PaddleOCR / TrOCR deneyimi, Ollama ile yerel LLM.
+- Güven skoruna dayalı yönlendirme: yalnızca eşiğin üstündekileri otomatik işle, gerisini onay kuyruğuna gönder.
+- v0.4 için Odoo sunucusunda zaten bulunan WhatsApp gateway modüllerini (`mail_gateway_whatsapp`, `wa_erp_bot`) yeniden kullan.
+- Metrik paneli: kanal başına belge sayısı, otomatik / onaylı oranı, veri çıkarma hata oranı.

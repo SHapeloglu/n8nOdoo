@@ -1,25 +1,31 @@
 # SESSION.md — n8nOdoo
 
-Newest entry on top: what was done, decisions, open issues, next step.
+En yeni kayıt en üstte: yapılanlar, kararlar, açık konular, sonraki adım.
+
+---
+
+## 2026-10-06
+
+- Tüm .md belgeleri Türkçeye çevrildi; "belgeler İngilizce" kuralı "belgeler Türkçe" olarak değiştirildi.
 
 ---
 
 ## 2026-10-05
 
-- Replaced the template-generated `CLAUDE.md`, `BACKLOG.md` and `SESSION.md` with content derived from the repo (README, ARCHITECTURE, PROJECT_PLAN, ROADMAP, docs/, schema, workflow).
-- Open: no `.gitignore` (add before any code/venv/.env appears); no tests yet; the M1 partner-lookup workflow has not been run against a real Odoo 18 instance.
-- Next: run `001_odoo_partner_lookup.json` against the Odoo test DB with a read-only API user and record results for the acceptance cases in `docs/M1-ODOO-PARTNER-MATCHING-API.md` (known VAT, customer-only, supplier-only, both, ambiguous, missing VAT, inactive, multi-company, auth failure, timeout).
+- Şablondan üretilmiş `CLAUDE.md`, `BACKLOG.md` ve `SESSION.md`, depodan (README, ARCHITECTURE, PROJECT_PLAN, ROADMAP, docs/, şema, iş akışı) türetilen içerikle değiştirildi.
+- Açık: `.gitignore` yok (kod/venv/.env oluşmadan önce ekle); henüz test yok; M1 iş ortağı arama iş akışı gerçek bir Odoo 18 örneğine karşı çalıştırılmadı.
+- Sonraki: `001_odoo_partner_lookup.json`'u salt okunur API kullanıcısıyla Odoo test DB'sine karşı çalıştır ve `docs/M1-ODOO-PARTNER-MATCHING-API.md` içindeki kabul senaryolarının sonuçlarını kaydet (bilinen VKN, yalnızca müşteri, yalnızca tedarikçi, her ikisi, belirsiz, VKN eksik, pasif, çoklu şirket, kimlik doğrulama hatası, zaman aşımı).
 
 ---
 
 ## 2026-09-29
 
-- Partner matching and document routing rules (`docs/M0-PARTNER-MATCHING.md`).
-- Odoo partner matching API design (`docs/M1-ODOO-PARTNER-MATCHING-API.md`).
-- First n8n workflow: read-only Odoo partner lookup by VAT.
+- İş ortağı eşleştirme ve belge yönlendirme kuralları (`docs/M0-PARTNER-MATCHING.md`).
+- Odoo iş ortağı eşleştirme API tasarımı (`docs/M1-ODOO-PARTNER-MATCHING-API.md`).
+- İlk n8n iş akışı: VKN ile salt okunur Odoo iş ortağı araması.
 
 ## 2026-09-28
 
-- Project documentation initialized (README, ARCHITECTURE, PROJECT_PLAN, ROADMAP, TASKS).
-- M0 reuse/dependency assessment and invoice-LLM reference analysis.
-- Normalized supplier invoice JSON schema.
+- Proje belgeleri oluşturuldu (README, ARCHITECTURE, PROJECT_PLAN, ROADMAP, TASKS).
+- M0 yeniden kullanım/bağımlılık değerlendirmesi ve fatura-LLM referans analizi.
+- Normalleştirilmiş tedarikçi faturası JSON şeması.
